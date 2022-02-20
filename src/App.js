@@ -5,6 +5,8 @@ import Big from 'big.js';
 import Form from './components/Form';
 import SignIn from './components/SignIn';
 import Messages from './components/Messages';
+import Display from './components/Display';
+
 
 const SUGGESTED_DONATION = '0';
 const BOATLOAD_OF_GAS = Big(3).times(10 ** 13).toFixed();
@@ -28,7 +30,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     // update blockchain data in background
     // add uuid to each message, so we know which one is already known
     contract.addMessage(
-      { text: message.value },
+      {  },
       BOATLOAD_OF_GAS,
       Big(donation.value || '0').times(10 ** 24).toFixed()
     ).then(() => {
@@ -59,17 +61,18 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   return (
     <main>
       <header>
-        <h1>NEAR Guest Book</h1>
+        <h1><font color='white'>People Evolve As Consciousness Expands</font></h1>
         { currentUser
-          ? <button onClick={signOut}>Log out</button>
-          : <button onClick={signIn}>Log in</button>
+          ? <button onClick={signOut}><font color='white'>Log out</font></button>
+          : <button onClick={signIn}><font color='white'>Log In</font></button>
         }
       </header>
       { currentUser
         ? <Form onSubmit={onSubmit} currentUser={currentUser} />
+        //? <Display currentUser={currentUser} />
         : <SignIn/>
       }
-      { !!currentUser && !!messages.length && <Messages messages={messages}/> }
+      { !!currentUser && !!messages.length && <Display currentUser={currentUser} /> }
     </main>
   );
 };

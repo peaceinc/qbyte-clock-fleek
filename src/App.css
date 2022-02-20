@@ -1,0 +1,87 @@
+* {
+  background-color: #282c34;
+}
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+  margin-top: 30px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  /* padding-top: 0px; */
+  padding-bottom: 20px;
+}
+
+.App-subtitle {
+  padding-bottom: 20px;
+  line-height: 0px;
+  font-size: 36px;
+}
+
+.App-heading {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 76px;
+}
+
+.App-link {
+  color: #61dafb;
+  /* margin-top: 30px; */
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+p
+.App-title {
+  font-size: 76px;
+  font-weight: bold;
+  padding-bottom: 10px;
+  /* line-height: 100px; */
+}
+.first-letter {
+  font-weight: bold;
+ 
+}
+
+#first-letter-1 {
+  color: red
+}
+
+#first-letter-2 {
+  color: green
+}
+
+#first-letter-3 {
+  color: rgb(0, 140, 255)
+}
+
+#first-letter-4 {
+  color: yellow
+}

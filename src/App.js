@@ -6,6 +6,7 @@ import Form from './components/Form';
 import SignIn from './components/SignIn';
 import Messages from './components/Messages';
 import Display from './components/Display';
+//import Clock from './components/clock';
 
 
 const SUGGESTED_DONATION = '0';
@@ -61,7 +62,25 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   return (
     <main>
       <header>
-        <h1><font color='white'>People Evolve As Consciousness Expands</font></h1>
+      <p className="App-title">
+            <code className="first-letter" id="first-letter-1">
+              H
+            </code>
+            <font color='white'>ypercube{" "}</font>
+            <code className="first-letter" id="first-letter-2">
+              A
+            </code>
+            <font color='white'>lgorithmic{" "}</font>
+            <code className="first-letter" id="first-letter-3">
+              L
+            </code>
+            <font color='white'>anguage{" "}</font>
+            <code className="first-letter" id="first-letter-4">
+              O
+            </code>
+            <font color='white'>racle</font>
+          </p>
+        
         { currentUser
           ? <button onClick={signOut}><font color='white'>Log out</font></button>
           : <button onClick={signIn}><font color='white'>Log In</font></button>

@@ -21,7 +21,7 @@ export default function Form({ onSubmit, currentUser }) {
         </p>
         <button type="submit">
           <font color='white'>
-          Donate (thank you!)
+          Buy Time
           </font>
         </button>
       </fieldset>

@@ -14,3 +14,5 @@ neardev/dev-account*
 
 # misc
 yarn-error.log
+mason/
+server/server.js

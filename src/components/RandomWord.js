@@ -13,7 +13,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function BasicGrid(props) {
-  console.log(`Some props:\n${Object.keys(props)}`);
+  // console.log(`Some props:\n${Object.keys(props)}`);
   return (
     <Box>
       <Grid container spacing={2.5}>

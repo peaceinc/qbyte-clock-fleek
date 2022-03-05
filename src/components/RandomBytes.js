@@ -65,24 +65,70 @@ function bytesToInt(bytes) {
 //   console.log("The line: " + line);
 // });
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+function wordGenerator(sepfile) {
+  let words = [];
+  for (let a in sepfile) {
+    if (sepfile[a].includes("QBYTE")) {
+      let xandy = sepfile[a].split(",");
+      var newWord = xandy[xandy.length - 1].slice(8);
+      words.push(newWord);
+    }
+    sleep(1000);
+  }
+  // console.log(words);
+  return words;
+}
+
 class RandomBytes extends Component {
   constructor(props) {
     super(props);
     this.state = {
       boxChars: getPseudoRandomBytes(),
       byteInteger: getPseudoRandomBytes()[8],
-      currentWord: "haphazard",
+      currentWord: "problematic",
       gotWord: "fjords",
+      words: [],
     };
   }
 
   componentDidMount() {
+    let wordArr = axios
+      .get(
+        "https://api.estuary.tech/collections/content/bfffcaab-d302-4bab-b0ed-552e450a2dc9",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer EST99cd9b05-5075-47b4-9897-f702f2e2ba2dARY",
+          },
+        }
+      )
+      .then((res) => {
+        var latest_cid = res.data[res.data.length - 1]["cid"];
+        let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
+        return axios.get(dataUrl);
+      })
+      .then((response) => {
+        let page_html = response.data.toString();
+        let sepfile = page_html.split("\n");
+        return wordGenerator(sepfile);
+      })
+      .then((array) => {
+        this.setState({
+          words: array,
+        });
+      })
+      .catch((error) => {
+        console.error("Error: ", error);
+      });
+
     this.timeout = setInterval(() => {
       let newBytes = getPseudoRandomBytes();
       this.setState({
         boxChars: newBytes,
         byteInteger: newBytes[8],
-        currentWord: wordBankArr[newBytes[8]],
+        currentWord: this.state.words[newBytes[8]],
       });
       // .then(
       //   axios.get(`/word/${this.state.byteInteger}`).then((res) => {

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Big from 'big.js';
 import Form from './components/Form';
 import SignIn from './components/SignIn';
-import Messages from './components/Messages';
+//import Messages from './components/Messages';
 import Display from './components/Display';
 //import Clock from './components/clock';
 
@@ -13,12 +13,12 @@ const SUGGESTED_DONATION = '0';
 const BOATLOAD_OF_GAS = Big(3).times(10 ** 13).toFixed();
 
 const App = ({ contract, currentUser, nearConfig, wallet }) => {
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    // TODO: don't just fetch once; subscribe!
-    contract.getMessages().then(setMessages);
-  }, []);
+  // useEffect(() => {
+  //   // TODO: don't just fetch once; subscribe!
+  //   contract.getMessages().then(setMessages);
+  // }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -30,24 +30,16 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     // TODO: optimistically update page with new message,
     // update blockchain data in background
     // add uuid to each message, so we know which one is already known
-    contract.addMessage(
+    contract.update_donation(
       {  },
       BOATLOAD_OF_GAS,
       Big(donation.value || '0').times(10 ** 24).toFixed()
-    ).then(() => {
-      contract.getMessages().then(messages => {
-        setMessages(messages);
-        message.value = '';
-        donation.value = SUGGESTED_DONATION;
-        fieldset.disabled = false;
-        message.focus();
-      });
-    });
+    );
   };
 
   const signIn = () => {
     wallet.requestSignIn(
-      {contractId: nearConfig.contractName, methodNames: [contract.addMessage.name]}, //contract requesting access
+      {contractId: nearConfig.contractName, methodNames: [contract.update_donation.name]}, //contract requesting access
       'NEAR Guest Book', //optional name
       null, //optional URL to redirect to if the sign in was successful
       null //optional URL to redirect to if the sign in was NOT successful
@@ -91,15 +83,14 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         //? <Display currentUser={currentUser} />
         : <SignIn/>
       }
-      { !!currentUser && !!messages.length && <Display currentUser={currentUser} /> }
+      { !!currentUser && <Display currentUser={currentUser} /> }
     </main>
   );
 };
 
 App.propTypes = {
   contract: PropTypes.shape({
-    addMessage: PropTypes.func.isRequired,
-    getMessages: PropTypes.func.isRequired
+    update_donation: PropTypes.func.isRequired,
   }).isRequired,
   currentUser: PropTypes.shape({
     accountId: PropTypes.string.isRequired,

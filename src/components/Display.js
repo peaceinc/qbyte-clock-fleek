@@ -6,16 +6,33 @@ import RandomBytes from "./RandomBytes";
 import Clock from './clock';
 //import Clock from 'react-clock';
 
-export default function Display({ currentUser }) {
+export default function Display({ currentUser, contract }) {
+
+
+
   return (
     <div className="App">
       <header className="App-header">
+
+        <script>
+
+          var amt_donated = contract.get_donation({
+          account_id: currentUser.accountId
+          });
+
+          var pretend_donated = 5
+
+          console.log(pretend_donated)
+        </script>
     
         <p>
           <font size = "6">Hybrid-Quantum Computing Spatial Relativity Time Dilation Clock with Non-deterministic Machine Learning Language Oracle </font>
         </p>
         <p>
-          <font size = "5">Welcome to the Q-Byte Clock, { currentUser.accountId }! The Q-Byte Clock tells the time while demonstrating what time is. The full user experience is coming soon, meanwhile, you can access interactive graphs and visuals from our Github.</font>
+          <font size = "5">Welcome to the Q-Byte Clock, { currentUser.accountId }! You have donated YACHTO.</font>
+        </p>
+        <p>
+          <font size = "5">The Q-Byte Clock tells the time while demonstrating what time is. The full user experience is coming soon, meanwhile, you can access interactive graphs and visuals from our Github.</font>
         </p>
         <a
           className="App-link"
@@ -44,6 +61,15 @@ export default function Display({ currentUser }) {
           Video Explanation for QByte Clock Data
           
         </a>
+
+        {/* <script>
+        if (pretend_donated > 3){
+
+
+        }
+
+        </script> */}
+
         <StyledEngineProvider injectFirst>
         <Clock />
           <RandomBytes />

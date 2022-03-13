@@ -20,6 +20,9 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   //   contract.getMessages().then(setMessages);
   // }, []);
 
+
+
+
   const onSubmit = (e) => {
     e.preventDefault();
 
@@ -35,6 +38,9 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
       BOATLOAD_OF_GAS,
       Big(donation.value || '0').times(10 ** 24).toFixed()
     );
+
+
+
   };
 
   const signIn = () => {
@@ -50,6 +56,10 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     wallet.signOut();
     window.location.replace(window.location.origin + window.location.pathname);
   };
+
+  // const amt_donated = contract.get_donation({
+  //   account_id: currentUser.accountId
+  // });
 
   return (
     <main>
@@ -83,7 +93,8 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         //? <Display currentUser={currentUser} />
         : <SignIn/>
       }
-      { !!currentUser && <Display currentUser={currentUser} /> }
+      
+      { !!currentUser && !!contract && <Display currentUser={currentUser} contract={contract}/> }
     </main>
   );
 };

@@ -13,14 +13,32 @@ const SUGGESTED_DONATION = '0';
 const BOATLOAD_OF_GAS = Big(3).times(10 ** 13).toFixed();
 
 const App = ({ contract, currentUser, nearConfig, wallet }) => {
-  // const [messages, setMessages] = useState([]);
+  const [donationvalue, setDonation] = useState([]);
 
-  // useEffect(() => {
-  //   // TODO: don't just fetch once; subscribe!
-  //   contract.getMessages().then(setMessages);
-  // }, []);
+  
+  useEffect(() => {
+
+    try{
+      contract.get_donation({
+        account_id: currentUser.accountId,
+        }).then(setDonation);
+
+        console.log(contract.get_donation({
+          account_id: currentUser.accountId,
+          }))
+
+    } catch {
+
+      contract.get_donation({
+        account_id: 'notloggedin',
+        }).then(setDonation);
+
+    }
+    console.log({donationvalue})
 
 
+
+  }, []);
 
 
   const onSubmit = (e) => {

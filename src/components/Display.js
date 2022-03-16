@@ -32,7 +32,7 @@ class Display extends Component {
         this.setState({
           currentDonation: amt_donated,
         });
-        if (this.state.currentDonation > 1) {
+        if (this.state.currentDonation > 0.9) {
           this.setState({
             displayClock: true,
           });
@@ -53,7 +53,7 @@ class Display extends Component {
           <p>
             <font size="5">
               Welcome to the Q-Byte Clock, {this.state.currentUser.accountId}!
-              You have donated {this.state.currentDonation} Yachto NEAR. Please donate at least 1 Yachto NEAR to view the clock.
+              You have donated {this.state.currentDonation} Yocto NEAR. Please donate at least 1 Yocto NEAR to view the clock.
             </font>
           </p>
           <p>

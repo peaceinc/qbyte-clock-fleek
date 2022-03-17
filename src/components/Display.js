@@ -65,7 +65,7 @@ class Display extends Component {
           </p>
           <a
             className="App-link"
-            href="https://www.haloai.me/model"
+            href="https://peacemuseum.wixsite.com/mysite/model"
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -4,6 +4,7 @@ import "../App.css";
 import { StyledEngineProvider } from "@mui/material/styles";
 import RandomBytes from "./RandomBytes";
 import Clock from "./clock";
+import YoutubeEmbed from "./YoutubeEmbed";
 //import Clock from 'react-clock';
 
 class Display extends Component {
@@ -103,6 +104,7 @@ class Display extends Component {
         </header>
 
         <img src={logo} className="App-logo" alt="logo" />
+        <YoutubeEmbed embedId="m4P2j5A9AkA" />
       </div>
     );
   }

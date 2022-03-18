@@ -22,12 +22,20 @@ function getPseudoRandomBytes() {
   }
   let intConvert = bytesToInt(arr);
   arr.push(intConvert);
+  //console.log(arr)
   return arr;
 }
 
 function bytesToInt(bytes) {
   var int = parseInt(bytes.join(""), 2);
   return int;
+}
+
+function GetRunningZ(X, N) {
+  var numerator = X - (N*8*0.5)
+  var denominator = Math.sqrt(N*8*0.25)
+  var Z = numerator/denominator
+  return Z
 }
 
 // function get_line(filename, line_no, callback) {
@@ -86,6 +94,9 @@ class RandomBytes extends Component {
     this.state = {
       boxChars: getPseudoRandomBytes(),
       byteInteger: getPseudoRandomBytes()[8],
+      byteIntegerSum: 0,
+      Ncount: 0,
+      RunningZ: 0.0,
       currentWord: "problematic",
       gotWord: "fjords",
       words: [],
@@ -93,6 +104,7 @@ class RandomBytes extends Component {
   }
 
   componentDidMount() {
+    //let Zct = 0
     let wordArr = axios
       .get(
         "https://api.estuary.tech/collections/content/bfffcaab-d302-4bab-b0ed-552e450a2dc9",
@@ -107,11 +119,13 @@ class RandomBytes extends Component {
       .then((res) => {
         var latest_cid = res.data[res.data.length - 1]["cid"];
         let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
+        console.log(dataUrl)
         return axios.get(dataUrl);
       })
       .then((response) => {
         let page_html = response.data.toString();
         let sepfile = page_html.split("\n");
+        console.log(wordGenerator(sepfile))
         return wordGenerator(sepfile);
       })
       .then((array) => {
@@ -128,8 +142,13 @@ class RandomBytes extends Component {
       this.setState({
         boxChars: newBytes,
         byteInteger: newBytes[8],
+        byteIntegerSum: this.state.byteIntegerSum + newBytes[0] + newBytes[1] + newBytes[2] + newBytes[3] + newBytes[4] + newBytes[5] + newBytes[6] + newBytes[7],
         currentWord: this.state.words[newBytes[8]],
+        Ncount: this.state.Ncount + 1,
+        RunningZ: GetRunningZ(this.state.byteIntegerSum + newBytes[0] + newBytes[1] + newBytes[2] + newBytes[3] + newBytes[4] + newBytes[5] + newBytes[6] + newBytes[7], this.state.Ncount + 1)
       });
+      //zct += this.state.byteInteger
+      //console.log(this.state.byteIntegerSum, this.state.Ncount, this.state.RunningZ)
       // .then(
       //   axios.get(`/word/${this.state.byteInteger}`).then((res) => {
       //     console.log(res);
@@ -186,6 +205,7 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
+        Running Z: {this.state.RunningZ}
       </div>
     );
   }

@@ -8,6 +8,7 @@ import RandomWord from "./RandomWord";
 import axios from "axios";
 import wordBankArr from "./wordBank";
 import ByteBankArr from "./byteBank";
+import Plot from 'react-plotly.js';
 //import {Line} from 'react-chartjs-2';
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -37,6 +38,7 @@ function GetRunningZ(X, N) {
   var numerator = X - (N*8*90*0.5)
   var denominator = Math.sqrt(N*8*90*0.25)
   var Z = numerator/denominator
+  //console.log(X)
   return Z
 }
 
@@ -46,6 +48,27 @@ function int2bitsum(X) {
     isum += ByteBankArr[X[a]]
   }
   return isum
+}
+
+function GetColors(X) {
+  var ColorArr = []
+  ColorArr.push(((X[0]*65536)+(X[1]*256)+(X[2])).toString(16))
+  ColorArr.push(((X[3]*65536)+(X[4]*256)+(X[5])).toString(16))
+  ColorArr.push(((X[6]*65536)+(X[7]*256)+(X[8])).toString(16))
+  ColorArr.push(((X[9]*65536)+(X[10]*256)+(X[11])).toString(16))
+  ColorArr.push(((X[12]*65536)+(X[13]*256)+(X[14])).toString(16))
+  ColorArr.push(((X[15]*65536)+(X[16]*256)+(X[17])).toString(16))
+  ColorArr.push(((X[18]*65536)+(X[19]*256)+(X[20])).toString(16))
+  ColorArr.push(((X[21]*65536)+(X[22]*256)+(X[23])).toString(16))
+  ColorArr.push(((X[24]*65536)+(X[25]*256)+(X[26])).toString(16))
+  ColorArr.push(((X[27]*65536)+(X[28]*256)+(X[29])).toString(16))
+  return ColorArr
+}
+
+function MyAppend(MyArr,MyAdd) {
+  let NewArr = MyArr;
+  NewArr.push(MyAdd)
+  return NewArr
 }
 
 // function get_line(filename, line_no, callback) {
@@ -98,6 +121,8 @@ function wordGenerator(sepfile) {
   return words;
 }
 
+
+
 //every second, based on the hash of user, pull 90 unique bytes from QBYTE line and use as their data and to draw colors, generate words, see trends, etc. 30 nodes max so 90 bytes. for now randomly select or hardcode these rather than hash. don't want to do too much processing on user side. This will render all at once. Also need auto-reload page every 10 min but may be problem saving state/graph unless save to blockchain
 function ActualRNG(sepfile) {
   let bytearr = [];
@@ -127,9 +152,12 @@ class RandomBytes extends Component {
       byteIntegerSum: 0,
       Ncount: 0,
       RunningZ: 0.0,
-      currentWord: "problematic",
+      currentWord: "loading...",
       gotWord: "fjords",
       usersbytes: [],
+      RunningZX: [],
+      RunningZY: [],
+      CurrentColors: [],
     };
   }
 
@@ -157,7 +185,7 @@ class RandomBytes extends Component {
       .then((response) => {
         let page_html = response.data.toString();
         let sepfile = page_html.split("\n");
-        console.log(ActualRNG(sepfile))
+        //console.log(ActualRNG(sepfile))
         //console.log(parseInt(ActualRNG(sepfile)[14][3])+parseInt(ActualRNG(sepfile)[15][3]))
         return ActualRNG(sepfile);
       })
@@ -173,6 +201,8 @@ class RandomBytes extends Component {
     this.timeout = setInterval(() => {
       let newBytes = getPseudoRandomBytes();
       let currentbytesum = int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
+      let MyColors = GetColors(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
+      let NewZscore = GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1)
       this.setState({
         boxChars: newBytes,
         byteInteger: newBytes[8],
@@ -181,8 +211,15 @@ class RandomBytes extends Component {
         //currentWord: this.state.words[this.state.Ncount%this.state.words.length],
         currentWord: wordBankArr[(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length][89]*256)+(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length][88])],
         Ncount: this.state.Ncount + 1,
-        RunningZ: GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1)
+        RunningZ: NewZscore,
+        RunningZX: MyAppend(this.state.RunningZX, this.state.Ncount + 1),
+        RunningZY: MyAppend(this.state.RunningZY,NewZscore),
+        CurrentColors: MyColors,
+        //RunningZX: this.state.usersbytes.push(14),
+        //RunningZX: MyAppend(this.state.RunningZX.slice(),this.state.Ncount + 1),
+        //RunningZY: MyAppend(this.state.RunningZY.slice(),GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1))
       });
+      //console.log(this.state.RunningZY)
       //console.log(int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length]))
       //console.log(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length].reduce((result,number)=> result+number))
       //zct += this.state.byteInteger
@@ -243,10 +280,45 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
-        Running Z: {this.state.RunningZ.toFixed(2)}
+        <Plot
+            data={[
+              {
+                x: this.state.RunningZX.slice(),
+                y: this.state.RunningZY.slice(),
+                type: 'scatter',
+                mode: 'lines',
+                marker: {color: 'red'},
+              },
+              //{type: 'bar', x: [1, 2, 3], y: [2, 9, 3]},
+            ]}
+            layout={{width: 600, height: 400, title: 'Running Z History'}}
+          />
+        <Plot
+            data={[
+              {
+                x: [1.0, 0.81, 0.31, -0.31, -0.81, -1.0, -0.81, -0.31, 0.31, 0.81],
+                y: [0.0, 0.59, 0.95, 0.95, 0.59, 0.0, -0.59, -0.95, -0.95, -0.59],
+                type: 'scatter',
+                mode: 'markers',
+                marker: {
+
+                  size: 40,
+              
+                  color: this.state.CurrentColors
+              
+                }
+              },
+              //{type: 'bar', x: [1, 2, 3], y: [2, 9, 3]},
+            ]}
+            layout={{width: 600, height: 400, title: this.state.currentWord}}
+          />
       </div>
     );
   }
 }
 
 export default RandomBytes;
+//        Running Z: {this.state.RunningZ.toFixed(2)}
+
+
+

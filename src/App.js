@@ -86,24 +86,24 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
             <code className="first-letter" id="first-letter-1">
               H
             </code>
-            <font color='white'>ypercube{" "}</font>
+            <font color='black'>ypercube{" "}</font>
             <code className="first-letter" id="first-letter-2">
               A
             </code>
-            <font color='white'>lgorithmic{" "}</font>
+            <font color='black'>lgorithmic{" "}</font>
             <code className="first-letter" id="first-letter-3">
               L
             </code>
-            <font color='white'>anguage{" "}</font>
+            <font color='black'>anguage{" "}</font>
             <code className="first-letter" id="first-letter-4">
               O
             </code>
-            <font color='white'>racle</font>
+            <font color='black'>racle</font>
           </p>
         
         { currentUser
-          ? <button onClick={signOut}><font color='white'>Log out</font></button>
-          : <button onClick={signIn}><font color='white'>Log In</font></button>
+          ? <button onClick={signOut}><font color='black'>Log out</font></button>
+          : <button onClick={signIn}><font color='black'>Log In</font></button>
         }
       </header>
       { currentUser

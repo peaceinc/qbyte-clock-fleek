@@ -20,7 +20,7 @@ export default function Form({ onSubmit, currentUser }) {
           <span title="NEAR Tokens">Ⓝ</span>
         </p>
         <button type="submit">
-          <font color='white'>
+          <font color='black'>
           Buy Time
           </font>
         </button>

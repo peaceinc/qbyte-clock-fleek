@@ -12,6 +12,7 @@ class Display extends Component {
     super(props);
     this.state = {
       currentDonation: 0,
+      displayPowerball: false,
       currentUser: this.props.currentUser,
       contract: this.props.contract,
       displayClock: false,
@@ -38,7 +39,15 @@ class Display extends Component {
             displayClock: true,
           });
         }
+        if (this.state.currentDonation > 31535999) {
+          this.setState({
+            
+            displayPowerball: true,
+          })
+          console.log("setting displayPowerball to ",this.state.displayPowerball)
+        }
       });
+
   }
 
   render() {
@@ -54,7 +63,7 @@ class Display extends Component {
           <p>
             <font size="5">
               Welcome to the Q-Byte Clock, {this.state.currentUser.accountId}!
-              You have donated {this.state.currentDonation} Yocto NEAR. Please donate at least 1 Yocto NEAR (0.000000000000000000000001 NEAR) to view the clock. Suggested donation is 0.000000000000000031536000 NEAR.
+              You have donated {this.state.currentDonation} Yocto NEAR. Please donate at least 1 Yocto NEAR (0.000000000000000000000001 NEAR) to view the clock. Suggested donation is 31536000 Yocto NEAR (1 Yocto NEAR per second for 1 year).
             </font>
           </p>
           <p>
@@ -98,7 +107,7 @@ class Display extends Component {
           >
             <StyledEngineProvider injectFirst>
               <Clock />
-              <RandomBytes />
+              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.displayPowerball}/>
             </StyledEngineProvider>
           </div>
         </header>

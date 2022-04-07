@@ -9,7 +9,14 @@ import axios from "axios";
 import wordBankArr from "./wordBank";
 import ByteBankArr from "./byteBank";
 import Plot from 'react-plotly.js';
+import { sha256 } from 'js-sha256';
+//import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
+
+//Todo: reload estuary/prng each time get to end of file and ensure pulling truly latest
+//Fleek deploy issue. Not catching IntlDon
+//music lk into and 3d plots
+
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -17,6 +24,54 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: "center",
   color: theme.palette.text.secondary,
 }));
+
+function MyHash(message) {
+  var hash = sha256.create();
+  hash.update(message);
+  return hash.hex();
+}
+
+//THIS IS WHERE THE MAGIC HAPPENS:
+function GetUserPowerball(intlmsg,intldonate) {
+    var hashedUser = MyHash(intlmsg)
+    let ultSet = []
+    for (var i = 0; i < 64; i+=2){
+      
+      var xx = parseInt(hashedUser.substring(i,i+2),16)
+      if (ultSet.includes(xx)==false && xx<250 && ultSet.length < 90) {
+        ultSet.push(xx)
+      }
+      
+    }
+
+    while (ultSet.length < 90) {
+      var NewHashedUser = MyHash(ultSet)
+      for (var i = 0; i < 64; i+=2) {
+        var xx = parseInt(NewHashedUser.substring(i,i+2),16)
+        if (ultSet.includes(xx)==false && xx<250 && ultSet.length < 90) {
+          ultSet.push(xx)
+        }
+
+      }
+    }
+
+    ultSet.sort(function(a, b){return a-b})
+
+  
+
+  if (intldonate < 31536000){
+    //I don't understand why I can't just redefine ultSet here but this works
+
+    let xxultSet = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
+
+    for (var i = 0; i < 90; i++) {
+      ultSet[i] = xxultSet[i]
+    }
+  }
+
+  console.log(ultSet)
+  return ultSet
+}
 
 function getPseudoRandomBytes() {
   let arr = [];
@@ -124,9 +179,9 @@ function wordGenerator(sepfile) {
 
 
 //every second, based on the hash of user, pull 90 unique bytes from QBYTE line and use as their data and to draw colors, generate words, see trends, etc. 30 nodes max so 90 bytes. for now randomly select or hardcode these rather than hash. don't want to do too much processing on user side. This will render all at once. Also need auto-reload page every 10 min but may be problem saving state/graph unless save to blockchain
-function ActualRNG(sepfile) {
+function ActualRNG(sepfile,xsamp) {
   let bytearr = [];
-  let xsamp = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
+  //let xsamp = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
   for (let a in sepfile) {
     if (sepfile[a].includes("QBYTE")) {
       let xandy = sepfile[a].split(",");
@@ -137,16 +192,29 @@ function ActualRNG(sepfile) {
 
       bytearr.push(newNums);
     }
-    sleep(1000);
+    //sleep(1000);
   }
   return bytearr;
 }
 
+function ActualPRNG() {
+  let bytearr = [];
+  for (var i = 0; i < 600; i++) {
+    let ixx = [];
+    for (var j = 0; j < 90; j++) {
+      ixx.push(parseInt(Math.random()*256))
+    }
+    bytearr.push(ixx);
+  }
+  return bytearr;
+}
 
 class RandomBytes extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      IntlHashMsg: this.props.IntlHashMsg,
+      IntlDon: this.props.IntlDon,
       boxChars: getPseudoRandomBytes(),
       byteInteger: getPseudoRandomBytes()[8],
       byteIntegerSum: 0,
@@ -161,13 +229,14 @@ class RandomBytes extends Component {
     };
   }
 
-
-
+  // collections b5864e77-7403-4a39-b573-e122fb87267f 47334123-5caa-4d98-9440-3b2412579842
+  
   componentDidMount() {
     //let Zct = 0
+    console.log(this.state.IntlDon, "intl don")
     let wordArr = axios
       .get(
-        "https://api.estuary.tech/collections/content/b5864e77-7403-4a39-b573-e122fb87267f",
+        "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
         {
           method: "GET",
           headers: {
@@ -187,7 +256,8 @@ class RandomBytes extends Component {
         let sepfile = page_html.split("\n");
         //console.log(ActualRNG(sepfile))
         //console.log(parseInt(ActualRNG(sepfile)[14][3])+parseInt(ActualRNG(sepfile)[15][3]))
-        return ActualRNG(sepfile);
+        
+        return ActualRNG(sepfile,GetUserPowerball(this.state.IntlHashMsg,this.state.IntlDon));
       })
       .then((array) => {
         this.setState({
@@ -196,7 +266,11 @@ class RandomBytes extends Component {
       })
       .catch((error) => {
         console.error("Error: ", error);
+        this.setState({
+          usersbytes: ActualPRNG(),
+        });
       });
+    
 
     this.timeout = setInterval(() => {
       let newBytes = getPseudoRandomBytes();

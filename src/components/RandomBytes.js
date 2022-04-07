@@ -10,6 +10,7 @@ import wordBankArr from "./wordBank";
 import ByteBankArr from "./byteBank";
 import Plot from 'react-plotly.js';
 import { sha256 } from 'js-sha256';
+import MIDISounds from 'midi-sounds-react';
 //import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
 
@@ -126,6 +127,26 @@ function MyAppend(MyArr,MyAdd) {
   return NewArr
 }
 
+function SelectNote(notesinchord) {
+  var yournote = notesinchord[parseInt(Math.random()*4)]
+  return yournote
+}
+
+function ChangeKey(currentseq) {
+  var newseq = currentseq
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 4; j++) {
+      if (currentseq[i][j]>50) {
+        newseq[i][j] -= 2
+      } else {
+        newseq[i][j] += 10
+      }
+
+    }
+  }
+  return newseq
+}
+
 // function get_line(filename, line_no, callback) {
 //   var stream = fs.createReadStream(filename, {
 //     flags: "r",
@@ -226,6 +247,11 @@ class RandomBytes extends Component {
       RunningZX: [],
       RunningZY: [],
       CurrentColors: [],
+			selectedInstrument: 797,
+			cached:true,
+      PlayingOrNot: 0,
+      ChordSeq: [[60,64,67,72],[60,65,68,72],[60,64,67,72],[60,65,69,72]],
+      ChordActive: 0,
     };
   }
 
@@ -233,7 +259,9 @@ class RandomBytes extends Component {
   
   componentDidMount() {
     //let Zct = 0
-    console.log(this.state.IntlDon, "intl don")
+    this.setState(this.state);
+
+    console.log(this.state.IntlDon, "intl don");
     let wordArr = axios
       .get(
         "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
@@ -293,6 +321,23 @@ class RandomBytes extends Component {
         //RunningZX: MyAppend(this.state.RunningZX.slice(),this.state.Ncount + 1),
         //RunningZY: MyAppend(this.state.RunningZY.slice(),GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1))
       });
+
+      var SwitchFx = this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length][69]//parseInt(Math.random()*256)
+      if (SwitchFx > 250) {
+        if (this.state.ChordActive == 3) {
+          this.setState({
+            ChordSeq: ChangeKey(this.state.ChordSeq),
+            ChordActive: 0
+          })
+        } else{
+          this.setState({
+            ChordActive: this.state.ChordActive + 1
+          })
+        }
+      }
+      if (this.state.PlayingOrNot > 0) {
+        this.midiSounds.playChordNow(this.state.selectedInstrument, [SelectNote(this.state.ChordSeq[this.state.ChordActive])], 0.3);
+      }
       //console.log(this.state.RunningZY)
       //console.log(int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length]))
       //console.log(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length].reduce((result,number)=> result+number))
@@ -310,7 +355,47 @@ class RandomBytes extends Component {
       // .catch((err) => console.log(`Error getting word:\n${err}`));
     }, 1000);
   }
-
+	onSelectInstrument(e){
+		var list=e.target;
+		let n = list.options[list.selectedIndex].getAttribute("value");
+		this.setState({
+			selectedInstrument: n
+			,cached:false
+		});
+		this.midiSounds.cacheInstrument(n);
+		var me=this;
+		this.midiSounds.player.loader.waitLoad(function () {
+			me.setState({
+				selectedInstrument: n
+				,cached:true
+			});
+		});
+	}
+	createSelectItems() {
+		if (this.midiSounds) {
+			if (!(this.items)) {
+				this.items = [];
+				for (let i = 0; i < this.midiSounds.player.loader.instrumentKeys().length; i++) {
+					this.items.push(<option key={i} value={i}>{'' + (i + 0) + '. ' + this.midiSounds.player.loader.instrumentInfo(i).title}</option>);
+				}
+			}
+			return this.items;
+		}
+	}
+	playTestInstrument() {
+		//this.midiSounds.playChordNow(this.state.selectedInstrument, [60,64,67,72], 1);
+    if (this.state.PlayingOrNot == 0) {
+      this.setState({
+        PlayingOrNot: 1
+      })
+    }
+    else {
+      this.setState({
+        PlayingOrNot: 0
+      })
+    }
+    
+	}
   componentWillUnmount() {
     clearInterval(this.timeout);
   }
@@ -354,6 +439,9 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
+        <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
+		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>Toggle Sound</button></p>
+        <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	
         <Plot
             data={[
               {

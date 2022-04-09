@@ -135,13 +135,14 @@ function SelectNote(notesinchord) {
 function ChangeKey(currentseq) {
   var newseq = currentseq
   for (var i = 0; i < 4; i++) {
-    for (var j = 0; j < 4; j++) {
-      if (currentseq[i][j]>50) {
-        newseq[i][j] -= 2
-      } else {
-        newseq[i][j] += 10
+    if (currentseq[i][0]<50 || currentseq[i][1]<50 || currentseq[i][2]<50 || currentseq[i][3]<50){
+      for (var j = 0; j < 4; j++) {
+          newseq[i][j] += 10
       }
-
+    } else {
+      for (var j = 0; j < 4; j++) {
+        newseq[i][j] -= 2
+      }
     }
   }
   return newseq
@@ -262,7 +263,7 @@ class RandomBytes extends Component {
     this.setState(this.state);
 
     console.log(this.state.IntlDon, "intl don");
-    let wordArr = axios
+    axios
       .get(
         "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
         {
@@ -291,6 +292,7 @@ class RandomBytes extends Component {
         this.setState({
           usersbytes: array,
         });
+        console.log("succesful estuary pull")
       })
       .catch((error) => {
         console.error("Error: ", error);
@@ -323,6 +325,7 @@ class RandomBytes extends Component {
       });
 
       var SwitchFx = this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length][69]//parseInt(Math.random()*256)
+      var MyNote = SwitchFx % 4
       if (SwitchFx > 250) {
         if (this.state.ChordActive == 3) {
           this.setState({
@@ -336,7 +339,7 @@ class RandomBytes extends Component {
         }
       }
       if (this.state.PlayingOrNot > 0) {
-        this.midiSounds.playChordNow(this.state.selectedInstrument, [SelectNote(this.state.ChordSeq[this.state.ChordActive])], 0.3);
+        this.midiSounds.playChordNow(this.state.selectedInstrument, [(this.state.ChordSeq[this.state.ChordActive])[MyNote]], 0.3);
       }
       //console.log(this.state.RunningZY)
       //console.log(int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length]))

@@ -231,6 +231,20 @@ function ActualPRNG() {
   return bytearr;
 }
 
+function FindLatest(estdat) {
+  let whenarr = [];
+  let whenarrunsort = [];
+  for (var i=0; i<estdat.length; i++) {
+    whenarr.push(estdat[i]["updatedAt"])
+    whenarrunsort.push(estdat[i]["updatedAt"])
+  }
+  whenarr.sort();
+  let latesttime = whenarr[whenarr.length -1]
+  let latestidx = whenarrunsort.indexOf(latesttime)
+  // console.log(estdat[latestidx]["cid"],"wam1")
+  return estdat[latestidx]["cid"]
+}
+
 class RandomBytes extends Component {
   constructor(props) {
     super(props);
@@ -263,6 +277,7 @@ class RandomBytes extends Component {
     this.setState(this.state);
 
     console.log(this.state.IntlDon, "intl don");
+    
     axios
       .get(
         "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
@@ -275,9 +290,10 @@ class RandomBytes extends Component {
         }
       )
       .then((res) => {
-        var latest_cid = res.data[res.data.length - 1]["cid"];
+        var latest_cid = FindLatest(res.data)//res.data[res.data.length - 1]["cid"];
         let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
         console.log(dataUrl)
+        console.log(res.data[15]["updatedAt"])
         return axios.get(dataUrl);
       })
       .then((response) => {

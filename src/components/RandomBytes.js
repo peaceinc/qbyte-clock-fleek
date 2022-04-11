@@ -482,7 +482,6 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
-        Debug stats: {this.state.Ncount} {this.state.usersbytes.length}
         <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
 		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>Toggle Sound</button></p>
         <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	

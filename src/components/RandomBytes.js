@@ -14,10 +14,9 @@ import MIDISounds from 'midi-sounds-react';
 //import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
 
-//Todo: reload estuary/prng each time get to end of file and ensure pulling truly latest
-//Fleek deploy issue. Not catching IntlDon
-//music lk into and 3d plots
-
+//Fleek deploy issue. Not catching IntlDon (dont care as much about this but good to know how react works.)
+//3d plots ... mus further
+//save data and stats with words etc appear dashboard below etc
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -60,15 +59,15 @@ function GetUserPowerball(intlmsg,intldonate) {
 
   
 
-  if (intldonate < 31536000){
-    //I don't understand why I can't just redefine ultSet here but this works
+  // if (intldonate < 31536000){
+  //   //I don't understand why I can't just redefine ultSet here but this works
 
-    let xxultSet = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
+  //   let xxultSet = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
 
-    for (var i = 0; i < 90; i++) {
-      ultSet[i] = xxultSet[i]
-    }
-  }
+  //   for (var i = 0; i < 90; i++) {
+  //     ultSet[i] = xxultSet[i]
+  //   }
+  // }
 
   console.log(ultSet)
   return ultSet
@@ -148,41 +147,6 @@ function ChangeKey(currentseq) {
   return newseq
 }
 
-// function get_line(filename, line_no, callback) {
-//   var stream = fs.createReadStream(filename, {
-//     flags: "r",
-//     encoding: "utf-8",
-//     fd: null,
-//     // mode: 0666,
-//     bufferSize: 64 * 1024,
-//   });
-
-//   var fileData = "";
-//   stream.on("data", function (data) {
-//     fileData += data;
-
-//     // The next lines should be improved
-//     var lines = fileData.split("\n");
-
-//     if (lines.length >= +line_no) {
-//       stream.destroy();
-//       callback(null, lines[+line_no]);
-//     }
-//   });
-
-//   stream.on("error", function () {
-//     callback("Error", null);
-//   });
-
-//   stream.on("end", function () {
-//     callback("File end reached without finding line", null);
-//   });
-// }
-
-// get_line("./Wordbank.txt", 0, function (err, line) {
-//   console.log("The line: " + line);
-// });
-
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function wordGenerator(sepfile) {
   let words = [];
@@ -231,7 +195,9 @@ function ActualPRNG() {
   return bytearr;
 }
 
-function FindLatest(estdat) {
+//finds latest CID not already used
+function FindLatest(estdat,pastcids) {
+  console.log(pastcids)
   let whenarr = [];
   let whenarrunsort = [];
   for (var i=0; i<estdat.length; i++) {
@@ -239,10 +205,16 @@ function FindLatest(estdat) {
     whenarrunsort.push(estdat[i]["updatedAt"])
   }
   whenarr.sort();
-  let latesttime = whenarr[whenarr.length -1]
-  let latestidx = whenarrunsort.indexOf(latesttime)
-  // console.log(estdat[latestidx]["cid"],"wam1")
-  return estdat[latestidx]["cid"]
+  var nowcid = 'xxx';
+  var i = 1;
+  while (pastcids.includes(nowcid) || i==1) {
+    let latesttime = whenarr[whenarr.length -i];
+    let latestidx = whenarrunsort.indexOf(latesttime);
+    var nowcid = estdat[latestidx]["cid"];
+    i++;
+  }
+
+  return nowcid
 }
 
 class RandomBytes extends Component {
@@ -267,6 +239,7 @@ class RandomBytes extends Component {
       PlayingOrNot: 0,
       ChordSeq: [[60,64,67,72],[60,65,68,72],[60,64,67,72],[60,65,69,72]],
       ChordActive: 0,
+      UsedCIDs: [],
     };
   }
 
@@ -290,10 +263,13 @@ class RandomBytes extends Component {
         }
       )
       .then((res) => {
-        var latest_cid = FindLatest(res.data)//res.data[res.data.length - 1]["cid"];
+        var latest_cid = FindLatest(res.data,this.state.UsedCIDs);
+        this.setState({
+          UsedCIDs: MyAppend(this.state.UsedCIDs,latest_cid),
+        });
         let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
-        console.log(dataUrl)
-        console.log(res.data[15]["updatedAt"])
+        console.log(dataUrl);
+        console.log(this.state.UsedCIDs)
         return axios.get(dataUrl);
       })
       .then((response) => {
@@ -312,6 +288,7 @@ class RandomBytes extends Component {
       })
       .catch((error) => {
         console.error("Error: ", error);
+        console.log("using PRNG instead");
         this.setState({
           usersbytes: ActualPRNG(),
         });
@@ -319,6 +296,53 @@ class RandomBytes extends Component {
     
 
     this.timeout = setInterval(() => {
+
+      if (this.state.Ncount%this.state.usersbytes.length==0 && this.state.Ncount>10) {
+        axios
+        .get(
+          "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer EST99cd9b05-5075-47b4-9897-f702f2e2ba2dARY",
+            },
+          }
+        )
+        .then((res) => {
+          var latest_cid = FindLatest(res.data,this.state.UsedCIDs)//res.data[res.data.length - 1]["cid"];
+          this.setState({
+            UsedCIDs: MyAppend(this.state.UsedCIDs,latest_cid),
+          });
+          let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
+          console.log(dataUrl)
+          console.log(this.state.UsedCIDs,"ALL USED CIDS")
+          return axios.get(dataUrl);
+        })
+        .then((response) => {
+          let page_html = response.data.toString();
+          let sepfile = page_html.split("\n");
+          //console.log(ActualRNG(sepfile))
+          //console.log(parseInt(ActualRNG(sepfile)[14][3])+parseInt(ActualRNG(sepfile)[15][3]))
+          
+          return ActualRNG(sepfile,GetUserPowerball(this.state.IntlHashMsg,this.state.IntlDon));
+        })
+        .then((array) => {
+          this.setState({
+            usersbytes: array,
+          });
+          console.log("succesful estuary pull")
+        })
+        .catch((error) => {
+          console.error("Error: ", error);
+          console.log("using PRNG instead");
+          this.setState({
+            usersbytes: ActualPRNG(),
+          });
+        });
+      }
+
+
       let newBytes = getPseudoRandomBytes();
       let currentbytesum = int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
       let MyColors = GetColors(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
@@ -458,6 +482,7 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
+        Debug stats: {this.state.Ncount} {this.state.usersbytes.length}
         <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
 		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>Toggle Sound</button></p>
         <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	

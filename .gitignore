@@ -17,3 +17,4 @@ yarn-error.log
 mason/
 server/server.js
 src/components/wordBank030422.js
+package-lock.json

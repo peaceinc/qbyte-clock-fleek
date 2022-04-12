@@ -14,7 +14,7 @@ import MIDISounds from 'midi-sounds-react';
 //import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
 
-//Fleek deploy issue. Not catching IntlDon (dont care as much about this but good to know how react works.)
+//Not catching IntlDon (dont care as much about this but good to know how react works.)
 //3d plots ... mus further
 //save data and stats with words etc appear dashboard below etc (button rs)
 

@@ -14,9 +14,10 @@ import MIDISounds from 'midi-sounds-react';
 //import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
 
-//Not catching IntlDon (dont care as much about this but good to know how react works.)
+//Not catching IntlDon ... important for tiered donations
 //3d plots ... mus further
 //save data and stats with words etc appear dashboard below etc (button rs)
+//first try a smoothing algorithm on AEM ... MI function ... 3d shapes ... special words append when MI=high.  May not have "trigger" for color change per se
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -105,18 +106,31 @@ function int2bitsum(X) {
   return isum
 }
 
+
+
 function GetColors(X) {
   var ColorArr = []
-  ColorArr.push(((X[0]*65536)+(X[1]*256)+(X[2])).toString(16))
-  ColorArr.push(((X[3]*65536)+(X[4]*256)+(X[5])).toString(16))
-  ColorArr.push(((X[6]*65536)+(X[7]*256)+(X[8])).toString(16))
-  ColorArr.push(((X[9]*65536)+(X[10]*256)+(X[11])).toString(16))
-  ColorArr.push(((X[12]*65536)+(X[13]*256)+(X[14])).toString(16))
-  ColorArr.push(((X[15]*65536)+(X[16]*256)+(X[17])).toString(16))
-  ColorArr.push(((X[18]*65536)+(X[19]*256)+(X[20])).toString(16))
-  ColorArr.push(((X[21]*65536)+(X[22]*256)+(X[23])).toString(16))
-  ColorArr.push(((X[24]*65536)+(X[25]*256)+(X[26])).toString(16))
-  ColorArr.push(((X[27]*65536)+(X[28]*256)+(X[29])).toString(16))
+  for (var i=0; i<30; i+=3) {
+    let sector = ((X[i]*256)+X[i+1])%6
+    if (sector==0) {
+      ColorArr.push(((255*65536)+(X[i+2]*256)+(0)).toString(16).padStart(6,'0'))
+    }
+    if (sector==1) {
+      ColorArr.push(((X[i+2]*65536)+(255*256)+(0)).toString(16).padStart(6,'0'))
+    }
+    if (sector==2) {
+      ColorArr.push(((0*65536)+(255*256)+(X[i+2])).toString(16).padStart(6,'0'))
+    }
+    if (sector==3) {
+      ColorArr.push(((0*65536)+(X[i+2]*256)+(255)).toString(16).padStart(6,'0'))
+    }
+    if (sector==4) {
+      ColorArr.push(((X[i+2]*65536)+(0*256)+(255)).toString(16).padStart(6,'0'))
+    }
+    if (sector==5) {
+      ColorArr.push(((255*65536)+(0*256)+(X[i+2])).toString(16).padStart(6,'0'))
+    }
+  }
   return ColorArr
 }
 
@@ -236,7 +250,8 @@ class RandomBytes extends Component {
       CurrentColors: [],
 			selectedInstrument: 797,
 			cached:true,
-      PlayingOrNot: 0,
+      PlayingOrNot: 1,
+      PlayingOrNotStr: "Sound Off",
       ChordSeq: [[60,64,67,72],[60,65,68,72],[60,64,67,72],[60,65,69,72]],
       ChordActive: 0,
       UsedCIDs: [],
@@ -429,12 +444,14 @@ class RandomBytes extends Component {
 		//this.midiSounds.playChordNow(this.state.selectedInstrument, [60,64,67,72], 1);
     if (this.state.PlayingOrNot == 0) {
       this.setState({
-        PlayingOrNot: 1
+        PlayingOrNot: 1,
+        PlayingOrNotStr: "Sound Off"
       })
     }
     else {
       this.setState({
-        PlayingOrNot: 0
+        PlayingOrNot: 0,
+        PlayingOrNotStr: "Sound On"
       })
     }
     
@@ -483,7 +500,7 @@ class RandomBytes extends Component {
         </Box>
         <RandomWord word={this.state.currentWord} />
         <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
-		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>Toggle Sound</button></p>
+		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>{this.state.PlayingOrNotStr}</button></p>
         <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	
         <Plot
             data={[
@@ -515,7 +532,7 @@ class RandomBytes extends Component {
               },
               //{type: 'bar', x: [1, 2, 3], y: [2, 9, 3]},
             ]}
-            layout={{width: 600, height: 400, title: this.state.currentWord}}
+            layout={{width: 600, height: 400, plot_bgcolor: "#000000", title: this.state.currentWord}}
           />
       </div>
     );

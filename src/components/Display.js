@@ -63,7 +63,8 @@ class Display extends Component {
           <p>
             <font size="5">
               Welcome to the Q-Byte Clock, {this.state.currentUser.accountId}!
-              You have donated {this.state.currentDonation} Yocto NEAR. Please donate at least 1 Yocto NEAR (0.000000000000000000000001 NEAR) to view the clock. Suggested donation is 31536000 Yocto NEAR (1 Yocto NEAR per second for 1 year).
+              You have donated {this.state.currentDonation} Yocto NEAR. Please donate at least 1 Yocto NEAR (0.000000000000000000000001 NEAR) to view the clock. Suggested donation is 31536000 Yocto NEAR (1 Yocto NEAR per second for 1 year). 
+              If you donated at least the suggested amount, you are seeing data unique to your NEAR address.
             </font>
           </p>
           <p>

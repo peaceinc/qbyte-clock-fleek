@@ -17,7 +17,7 @@ import MIDISounds from 'midi-sounds-react';
 //Not catching IntlDon ... important for tiered donations
 //3d plots ... mus further
 //save data and stats with words etc appear dashboard below etc (button rs)
-//first try a smoothing algorithm on AEM ... MI function ... 3d shapes ... special words append when MI=high.  May not have "trigger" for color change per se
+//graph interaction...  HC actual shape
 
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -107,31 +107,66 @@ function int2bitsum(X) {
 }
 
 
+function getStandardDeviation (array) {
+  const n = array.length
+  const mean = array.reduce((a, b) => a + b) / n
+  return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n)
+}
+
 
 function GetColors(X) {
   var ColorArr = []
-  for (var i=0; i<30; i+=3) {
+  var uu=[]
+  var vv=[]
+  for (var i=0; i<X.length; i+=3) {
     let sector = ((X[i]*256)+X[i+1])%6
+    let theta = (Math.PI*(1/3)*sector)+((X[i+2]/65536)*Math.PI*(1/3))
+    uu.push(Math.sin(theta));
+    vv.push(Math.cos(theta));
     if (sector==0) {
-      ColorArr.push(((255*65536)+(X[i+2]*256)+(0)).toString(16).padStart(6,'0'))
+      //ColorArr.push(((255*65536)+(X[i+2]*256)+(0)).toString(16).padStart(6,'0'))
+      ColorArr.push('rgb(255, '+X[i+2]+', 0)')
     }
     if (sector==1) {
-      ColorArr.push(((X[i+2]*65536)+(255*256)+(0)).toString(16).padStart(6,'0'))
+      //ColorArr.push(((X[i+2]*65536)+(255*256)+(0)).toString(16).padStart(6,'0'))
+      ColorArr.push('rgb('+X[i+2]+', 255, 0)')
     }
     if (sector==2) {
-      ColorArr.push(((0*65536)+(255*256)+(X[i+2])).toString(16).padStart(6,'0'))
+      //ColorArr.push(((0*65536)+(255*256)+(X[i+2])).toString(16).padStart(6,'0'))
+      ColorArr.push('rgb(0, 255, '+X[i+2]+')')
     }
     if (sector==3) {
-      ColorArr.push(((0*65536)+(X[i+2]*256)+(255)).toString(16).padStart(6,'0'))
+      //ColorArr.push(((0*65536)+(X[i+2]*256)+(255)).toString(16).padStart(6,'0'))
+      ColorArr.push('rgb(0, '+X[i+2]+', 255)')
     }
     if (sector==4) {
-      ColorArr.push(((X[i+2]*65536)+(0*256)+(255)).toString(16).padStart(6,'0'))
+      //ColorArr.push(((X[i+2]*65536)+(0*256)+(255)).toString(16).padStart(6,'0'))
+      ColorArr.push('rgb('+X[i+2]+', 0, 255)')
     }
     if (sector==5) {
-      ColorArr.push(((255*65536)+(0*256)+(X[i+2])).toString(16).padStart(6,'0'))
+      //ColorArr.push(((255*65536)+(0*256)+(X[i+2])).toString(16).padStart(6,'0'))
+      ColorArr.push('rgb(255, 0, '+X[i+2]+')')
     }
   }
-  return ColorArr
+  let ColorCoherence = Math.sqrt((Math.pow(getStandardDeviation(uu.slice(0,10)),2))+(Math.pow(getStandardDeviation(vv.slice(0,10)),2)))//first 10 for AEM
+
+  //Moran's I Calculation:
+  //this computation is not feasible in this enviornment...even in packed form :(), try std u's and v's or something...math req cuz not just a line.
+  // let SSQK = 10
+  // let KCT = 20
+  // let WM = [[1,9],[0,2],[1,3],[2,4],[3,5],[4,6],[5,7],[6,8],[7,9],[8,0]]
+  // var KSUM = 0
+
+  // for (var i=0; uu.length; i++) {
+  //   for (var j=0; WM[i].length; j++) {
+  //     KSUM += ((uu[i]*uu[WM[i][j]]) + (vv[i]*vv[WM[i][j]]))
+  //   }
+  // }
+  // console.log(KSUM)
+  // let Ival = ((uu.length*Ksum)/(Kct*SSQ_K))
+  // console.log(IVAL)
+
+  return [ColorArr,ColorCoherence]
 }
 
 function MyAppend(MyArr,MyAdd) {
@@ -248,6 +283,7 @@ class RandomBytes extends Component {
       RunningZX: [],
       RunningZY: [],
       CurrentColors: [],
+      CurrentVSTD: 1.0,
 			selectedInstrument: 797,
 			cached:true,
       PlayingOrNot: 1,
@@ -255,6 +291,7 @@ class RandomBytes extends Component {
       ChordSeq: [[60,64,67,72],[60,65,68,72],[60,64,67,72],[60,65,69,72]],
       ChordActive: 0,
       UsedCIDs: [],
+      SpecialWords: [],
     };
   }
 
@@ -360,7 +397,9 @@ class RandomBytes extends Component {
 
       let newBytes = getPseudoRandomBytes();
       let currentbytesum = int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
-      let MyColors = GetColors(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
+      let InfoColors = GetColors(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length])
+      let MyColors = InfoColors[0]
+      let ColorSync = InfoColors[1]
       let NewZscore = GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1)
       this.setState({
         boxChars: newBytes,
@@ -374,11 +413,17 @@ class RandomBytes extends Component {
         RunningZX: MyAppend(this.state.RunningZX, this.state.Ncount + 1),
         RunningZY: MyAppend(this.state.RunningZY,NewZscore),
         CurrentColors: MyColors,
+        CurrentVSTD: ColorSync,
         //RunningZX: this.state.usersbytes.push(14),
         //RunningZX: MyAppend(this.state.RunningZX.slice(),this.state.Ncount + 1),
         //RunningZY: MyAppend(this.state.RunningZY.slice(),GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1))
       });
 
+      if (this.state.CurrentVSTD < 0.7) {
+        this.setState({
+          SpecialWords: MyAppend(this.state.SpecialWords,this.state.currentWord),
+        })
+      }
       var SwitchFx = this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length][69]//parseInt(Math.random()*256)
       var MyNote = SwitchFx % 4
       if (SwitchFx > 250) {
@@ -499,6 +544,13 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
+        <br></br>
+        Color Coherence AEM (vector stdev RGB): {this.state.CurrentVSTD.toFixed(3)}
+        <br></br>
+        Special Words saved for stdev less than 0.7 (about 1 in 1000)
+        <br></br>
+        <br></br>
+        Special Words: {this.state.SpecialWords.toString()}
         <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
 		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>{this.state.PlayingOrNotStr}</button></p>
         <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	
@@ -526,13 +578,32 @@ class RandomBytes extends Component {
 
                   size: 40,
               
-                  color: this.state.CurrentColors
+                  color: this.state.CurrentColors.slice(0,10)
               
                 }
               },
               //{type: 'bar', x: [1, 2, 3], y: [2, 9, 3]},
             ]}
             layout={{width: 600, height: 400, plot_bgcolor: "#000000", title: this.state.currentWord}}
+          />
+
+        <Plot
+            data={[
+              {
+                x: [4,3,4,4,5,7,1,4,4,7,7,8,0,1,1,3,4,5,3,4,5,7,1,4,4,3,4,4,5,4],
+                y: [4,4,3,5,4,4,4,7,1,3,5,4,4,3,5,7,8,7,1,0,1,4,4,7,1,4,3,5,4,4],
+                z: [0,1,1,1,1,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,7,7,7,7,8],
+                type: 'scatter3d',
+                mode: 'markers',
+                marker: {
+
+                  size: 10,
+                  color: this.state.CurrentColors.slice(0,30)
+              
+                }
+              },
+            ]}
+            layout={{width: 600, height: 400, paper_bgcolor: "#000000"}}
           />
       </div>
     );

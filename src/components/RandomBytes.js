@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 // import * as React from "react";
 import { styled } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
@@ -34,6 +35,7 @@ function MyHash(message) {
 
 //THIS IS WHERE THE MAGIC HAPPENS:
 function GetUserPowerball(intlmsg,intldonate) {
+    console.log(intlmsg,intldonate)
     var hashedUser = MyHash(intlmsg)
     let ultSet = []
     for (var i = 0; i < 64; i+=2){
@@ -60,15 +62,15 @@ function GetUserPowerball(intlmsg,intldonate) {
 
   
 
-  // if (intldonate < 31536000){
+  if (intldonate < 31536000){
   //   //I don't understand why I can't just redefine ultSet here but this works
 
-  //   let xxultSet = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
+    let xxultSet = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
 
-  //   for (var i = 0; i < 90; i++) {
-  //     ultSet[i] = xxultSet[i]
-  //   }
-  // }
+    for (var i = 0; i < 90; i++) {
+      ultSet[i] = xxultSet[i]
+    }
+  }
 
   console.log(ultSet)
   return ultSet
@@ -246,7 +248,7 @@ function ActualPRNG() {
 
 //finds latest CID not already used
 function FindLatest(estdat,pastcids) {
-  console.log(pastcids)
+  // console.log(pastcids)
   let whenarr = [];
   let whenarrunsort = [];
   for (var i=0; i<estdat.length; i++) {
@@ -272,6 +274,10 @@ class RandomBytes extends Component {
     this.state = {
       IntlHashMsg: this.props.IntlHashMsg,
       IntlDon: this.props.IntlDon,
+      showAEM: this.props.showAEM,
+      showHC: this.props.showHC,
+      showMidi: this.props.showMidi,
+      showOracle: this.props.showOracle,
       boxChars: getPseudoRandomBytes(),
       byteInteger: getPseudoRandomBytes()[8],
       byteIntegerSum: 0,
@@ -292,6 +298,30 @@ class RandomBytes extends Component {
       ChordActive: 0,
       UsedCIDs: [],
       SpecialWords: [],
+      hideDisplayAEM: {
+        display: "none",
+      },
+      showDisplayAEM: {
+          display: "contents",
+      },
+      hideDisplayHC: {
+          display: "none",
+        },
+      showDisplayHC: {
+          display: "contents",
+      },
+      hideDisplayMidi: {
+        display: "none",
+      },
+      showDisplayMidi: {
+          display: "contents",
+      },
+      hideDisplayOracle: {
+          display: "none",
+        },
+      showDisplayOracle: {
+          display: "contents",
+      },
     };
   }
 
@@ -301,7 +331,7 @@ class RandomBytes extends Component {
     //let Zct = 0
     this.setState(this.state);
 
-    console.log(this.state.IntlDon, "intl don");
+    
     
     axios
       .get(
@@ -321,7 +351,7 @@ class RandomBytes extends Component {
         });
         let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
         console.log(dataUrl);
-        console.log(this.state.UsedCIDs)
+        //console.log(this.state.UsedCIDs)
         return axios.get(dataUrl);
       })
       .then((response) => {
@@ -330,7 +360,7 @@ class RandomBytes extends Component {
         //console.log(ActualRNG(sepfile))
         //console.log(parseInt(ActualRNG(sepfile)[14][3])+parseInt(ActualRNG(sepfile)[15][3]))
         
-        return ActualRNG(sepfile,GetUserPowerball(this.state.IntlHashMsg,this.state.IntlDon));
+        return ActualRNG(sepfile,GetUserPowerball(this.state.IntlHashMsg,this.props.IntlDon));
       })
       .then((array) => {
         this.setState({
@@ -368,7 +398,7 @@ class RandomBytes extends Component {
           });
           let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
           console.log(dataUrl)
-          console.log(this.state.UsedCIDs,"ALL USED CIDS")
+          //console.log(this.state.UsedCIDs,"ALL USED CIDS")
           return axios.get(dataUrl);
         })
         .then((response) => {
@@ -438,7 +468,7 @@ class RandomBytes extends Component {
           })
         }
       }
-      if (this.state.PlayingOrNot > 0) {
+      if (this.state.PlayingOrNot > 0 && this.props.IntlDon > 10000000000000000000000) {
         this.midiSounds.playChordNow(this.state.selectedInstrument, [(this.state.ChordSeq[this.state.ChordActive])[MyNote]], 0.3);
       }
       //console.log(this.state.RunningZY)
@@ -544,16 +574,42 @@ class RandomBytes extends Component {
           </Grid>
         </Box>
         <RandomWord word={this.state.currentWord} />
-        <br></br>
-        Color Coherence AEM (vector stdev RGB): {this.state.CurrentVSTD.toFixed(3)}
-        <br></br>
-        Special Words saved for stdev less than 0.7 (about 1 in 1000)
-        <br></br>
-        <br></br>
-        Special Words: {this.state.SpecialWords.toString()}
-        <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
-		    <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>{this.state.PlayingOrNotStr}</button></p>
-        <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	
+        <div
+          style={
+            this.props.showOracle
+              ? this.state.showDisplayOracle
+              : this.state.hideDisplayOracle
+            }
+          >
+          <StyledEngineProvider injectFirst>
+            <br></br>
+            Color Coherence AEM (vector stdev RGB): {this.state.CurrentVSTD.toFixed(3)}
+            <br></br>
+            Language Oracle builds for stdev less than 0.7 (about 1 in 1000)
+            <br></br>
+            <br></br>
+            Language Oracle: {this.state.SpecialWords.toString()}
+          </StyledEngineProvider>
+        </div>
+
+        <div
+          style={
+            this.props.showMidi
+              ? this.state.showDisplayMidi
+              : this.state.hideDisplayMidi
+            }
+          >
+          <StyledEngineProvider injectFirst>
+            <p><select value={this.state.selectedInstrument} onChange={this.onSelectInstrument.bind(this)}>{this.createSelectItems()}</select></p>
+		        <p><button onClick={this.playTestInstrument.bind(this)} disabled={!this.state.cached}>{this.state.PlayingOrNotStr}</button></p>
+            <MIDISounds ref={(ref) => (this.midiSounds = ref)} appElementName="root" instruments={[4]} />	
+          </StyledEngineProvider>
+        </div>
+
+
+
+
+
         <Plot
             data={[
               {
@@ -567,44 +623,67 @@ class RandomBytes extends Component {
             ]}
             layout={{width: 600, height: 400, title: 'Running Z History'}}
           />
-        <Plot
-            data={[
-              {
-                x: [1.0, 0.81, 0.31, -0.31, -0.81, -1.0, -0.81, -0.31, 0.31, 0.81],
-                y: [0.0, 0.59, 0.95, 0.95, 0.59, 0.0, -0.59, -0.95, -0.95, -0.59],
-                type: 'scatter',
-                mode: 'markers',
-                marker: {
 
-                  size: 40,
-              
-                  color: this.state.CurrentColors.slice(0,10)
-              
-                }
-              },
-              //{type: 'bar', x: [1, 2, 3], y: [2, 9, 3]},
-            ]}
-            layout={{width: 600, height: 400, plot_bgcolor: "#000000", title: this.state.currentWord}}
-          />
+        <div
+          style={
+            this.props.showAEM
+              ? this.state.showDisplayAEM
+              : this.state.hideDisplayAEM
+            }
+          >
+          <StyledEngineProvider injectFirst>
+            <Plot
+              data={[
+                {
+                  x: [1.0, 0.81, 0.31, -0.31, -0.81, -1.0, -0.81, -0.31, 0.31, 0.81],
+                  y: [0.0, 0.59, 0.95, 0.95, 0.59, 0.0, -0.59, -0.95, -0.95, -0.59],
+                  type: 'scatter',
+                  mode: 'markers',
+                  marker: {
 
-        <Plot
-            data={[
-              {
-                x: [4,3,4,4,5,7,1,4,4,7,7,8,0,1,1,3,4,5,3,4,5,7,1,4,4,3,4,4,5,4],
-                y: [4,4,3,5,4,4,4,7,1,3,5,4,4,3,5,7,8,7,1,0,1,4,4,7,1,4,3,5,4,4],
-                z: [0,1,1,1,1,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,7,7,7,7,8],
-                type: 'scatter3d',
-                mode: 'markers',
-                marker: {
+                    size: 40,
+                
+                    color: this.state.CurrentColors.slice(0,10)
+                
+                  }
+                },
+                //{type: 'bar', x: [1, 2, 3], y: [2, 9, 3]},
+              ]}
+              layout={{width: 600, height: 400, plot_bgcolor: "#000000", title: this.state.currentWord}}
+            />
+          </StyledEngineProvider>
+        </div>
+        
+        <div
+          style={
+            this.props.showHC
+              ? this.state.showDisplayHC
+              : this.state.hideDisplayHC
+            }
+          >
+          <StyledEngineProvider injectFirst>
+            <Plot
+              data={[
+                {
+                  x: [4,3,4,4,5,7,1,4,4,7,7,8,0,1,1,3,4,5,3,4,5,7,1,4,4,3,4,4,5,4],
+                  y: [4,4,3,5,4,4,4,7,1,3,5,4,4,3,5,7,8,7,1,0,1,4,4,7,1,4,3,5,4,4],
+                  z: [0,1,1,1,1,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,7,7,7,7,8],
+                  type: 'scatter3d',
+                  mode: 'markers',
+                  marker: {
 
-                  size: 10,
-                  color: this.state.CurrentColors.slice(0,30)
-              
-                }
-              },
-            ]}
-            layout={{width: 600, height: 400, paper_bgcolor: "#000000"}}
-          />
+                    size: 10,
+                    color: this.state.CurrentColors.slice(0,30)
+                
+                  }
+                },
+              ]}
+              layout={{width: 600, height: 400, paper_bgcolor: "#000000"}}
+            />
+          </StyledEngineProvider>
+        </div>
+
+
       </div>
     );
   }

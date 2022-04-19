@@ -12,10 +12,13 @@ class Display extends Component {
     super(props);
     this.state = {
       currentDonation: 0,
-      displayPowerball: false,
       currentUser: this.props.currentUser,
       contract: this.props.contract,
       displayClock: false,
+      displayAEM: false,
+      displayHC: false,
+      displayMidi: false,
+      displayOracle: false,
       hideDisplay: {
         display: "none",
       },
@@ -39,12 +42,25 @@ class Display extends Component {
             displayClock: true,
           });
         }
-        if (this.state.currentDonation > 31535999) {
+        if (this.state.currentDonation > 27182818) {
           this.setState({
-            
-            displayPowerball: true,
-          })
-          console.log("setting displayPowerball to ",this.state.displayPowerball)
+            displayAEM: true,
+          });
+        }
+        if (this.state.currentDonation > 31415927) {
+          this.setState({
+            displayHC: true,
+          });
+        }
+        if (this.state.currentDonation > 10000000000000000000000) {
+          this.setState({
+            displayMidi: true,
+          });
+        }
+        if (this.state.currentDonation > 100000000000000000000000) {
+          this.setState({
+            displayOracle: true,
+          });
         }
       });
 
@@ -63,8 +79,30 @@ class Display extends Component {
           <p>
             <font size="5">
               Welcome to the Q-Byte Clock, {this.state.currentUser.accountId}!
-              You have donated {this.state.currentDonation} Yocto NEAR. Please donate at least 1 Yocto NEAR (0.000000000000000000000001 NEAR) to view the clock. Suggested donation is 31536000 Yocto NEAR (1 Yocto NEAR per second for 1 year). 
-              If you donated at least the suggested amount, you are seeing data unique to your NEAR address.
+              You have donated {this.state.currentDonation/(1000000000000000000000000)} NEAR.
+            </font>
+          </p>
+          <p>
+            <font size="5">
+              Donation Tiers (1 Yocto NEAR = 0.000000000000000000000001 NEAR):
+              <br></br>
+              <br></br>
+              1 Yocto NEAR: unlocks the basic clock with 1 word displayed per second
+              <br></br>
+              <br></br>
+              27182818 Yocto NEAR: Unlocks the AEtherspheric Modulator (2 dimensional array of colors)
+              <br></br>
+              <br></br>
+              31415927 Yocto NEAR: Unlocks the Hypercube (3 dimensional array of colors)
+              <br></br>
+              <br></br>
+              0.01 NEAR: Unlocks sound effects (you can turn these on and off)
+              <br></br>
+              <br></br>
+              0.1 NEAR: Unlocks word oracle
+              <br></br>
+              <br></br>
+              1 NEAR: Data stream is personalized to your NEAR address
             </font>
           </p>
           <p>
@@ -108,7 +146,7 @@ class Display extends Component {
           >
             <StyledEngineProvider injectFirst>
               <Clock />
-              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.displayPowerball}/>
+              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.currentDonation} showAEM={this.state.displayAEM} showHC={this.state.displayHC} showMidi={this.state.displayMidi} showOracle={this.state.displayOracle} />
             </StyledEngineProvider>
           </div>
         </header>

@@ -61,6 +61,16 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
 
   };
 
+  function onSubmitData(e,value) {
+    e.preventDefault();
+
+    contract.update_storestr(
+      { "mystr":value },
+      BOATLOAD_OF_GAS,
+    );
+
+  };
+
   const signIn = () => {
     wallet.requestSignIn(
       {contractId: nearConfig.contractName, methodNames: [contract.update_donation.name]}, //contract requesting access
@@ -112,7 +122,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         : <SignIn/>
       }
       
-      { !!currentUser && !!contract && <Display currentUser={currentUser} contract={contract}/> }
+      { !!currentUser && !!contract && <Display currentUser={currentUser} contract={contract} onSubmitData={onSubmitData}/> }
     </main>
   );
 };

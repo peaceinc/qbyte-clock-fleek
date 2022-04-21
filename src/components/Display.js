@@ -7,13 +7,28 @@ import Clock from "./clock";
 import YoutubeEmbed from "./YoutubeEmbed";
 //import Clock from 'react-clock';
 
+function GetTableData(instr) {
+  let sessions = instr.split(';-999;');
+  var OutData = []
+  for (var i=0; i < sessions.length -1; i++) {
+    let sdata = sessions[i].split(';')
+    //let sstr = '{"zscore":'+sdata[0]+', "oracle":"'+sdata[1]+'" }'
+    let sstr = '{"datetime":"'+sdata[0]+'", "zscore":'+sdata[1]+', "n":'+sdata[2]+', "oracle":"'+sdata[3]+'" }'
+    OutData.push(JSON.parse(sstr))
+  }
+  return OutData
+
+}
+
 class Display extends Component {
   constructor(props) {
     super(props);
     this.state = {
       currentDonation: 0,
+      obtainedTablestring: 'Thu Apr 21 2022 15:18:56 GMT-0700 (Pacific Daylight Time);-0.280;16;job-training;-999;',
       currentUser: this.props.currentUser,
       contract: this.props.contract,
+      onSubmitData: this.props.onSubmitData,
       displayClock: false,
       displayAEM: false,
       displayHC: false,
@@ -42,31 +57,44 @@ class Display extends Component {
             displayClock: true,
           });
         }
-        if (this.state.currentDonation > 27182818) {
+        if (this.state.currentDonation >= 27182818) {
           this.setState({
             displayAEM: true,
           });
         }
-        if (this.state.currentDonation > 31415927) {
+        if (this.state.currentDonation >= 31415927) {
           this.setState({
             displayHC: true,
           });
         }
-        if (this.state.currentDonation > 10000000000000000000000) {
+        if (this.state.currentDonation >= 100000000000000000000) {
           this.setState({
             displayMidi: true,
           });
         }
-        if (this.state.currentDonation > 100000000000000000000000) {
+        if (this.state.currentDonation >= 1000000000000000000000) {
           this.setState({
             displayOracle: true,
           });
         }
       });
 
+      this.state.contract
+      .get_storestr({
+        account_id: this.state.currentUser.accountId,
+      })
+      .then((obtainedstring) => {
+        this.setState({
+          obtainedTablestring: obtainedstring,
+        });
+      });
+
   }
 
+
+//
   render() {
+    const MyData = GetTableData(this.state.obtainedTablestring)
     return (
       <div className="App">
         <header className="App-header">
@@ -96,13 +124,13 @@ class Display extends Component {
               31415927 Yocto NEAR: Unlocks the Hypercube (3 dimensional array of colors)
               <br></br>
               <br></br>
-              0.01 NEAR: Unlocks sound effects (you can turn these on and off)
+              0.0001 NEAR: Unlocks sound effects (you can turn these on and off)
               <br></br>
               <br></br>
-              0.1 NEAR: Unlocks word oracle
+              0.001 NEAR: Unlocks word oracle
               <br></br>
               <br></br>
-              1 NEAR: Data stream is personalized to your NEAR address
+              0.01 NEAR: Data stream is personalized to your NEAR address
             </font>
           </p>
           <p>
@@ -146,9 +174,28 @@ class Display extends Component {
           >
             <StyledEngineProvider injectFirst>
               <Clock />
-              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.currentDonation} showAEM={this.state.displayAEM} showHC={this.state.displayHC} showMidi={this.state.displayMidi} showOracle={this.state.displayOracle} />
+              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.currentDonation} showAEM={this.state.displayAEM} showHC={this.state.displayHC} showMidi={this.state.displayMidi} showOracle={this.state.displayOracle} onSubmitData={this.props.onSubmitData}/>
             </StyledEngineProvider>
           </div>
+        
+        <table>
+          <tr>
+            <th>datetime</th>
+            <th>zscore</th>
+            <th>n</th>
+            <th>oracle</th>
+          </tr>
+          {MyData.map((val, key) => {
+            return (
+              <tr key={key}>
+                <td>{val.datetime}</td>
+                <td>{val.zscore}</td>
+                <td>{val.n}</td>
+                <td>{val.oracle}</td>
+              </tr>
+            )
+          })}
+        </table>
         </header>
 
         <img src={logo} className="App-logo" alt="logo" />

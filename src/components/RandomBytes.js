@@ -12,6 +12,7 @@ import ByteBankArr from "./byteBank";
 import Plot from 'react-plotly.js';
 import { sha256 } from 'js-sha256';
 import MIDISounds from 'midi-sounds-react';
+import Savebutton from "./Savebutton"
 //import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
 
@@ -62,7 +63,7 @@ function GetUserPowerball(intlmsg,intldonate) {
 
   
 
-  if (intldonate < 31536000){
+  if (intldonate < 0.01){
   //   //I don't understand why I can't just redefine ultSet here but this works
 
     let xxultSet = [5, 6, 8, 14, 17, 18, 20, 24, 26, 28, 32, 35, 38, 40, 45, 46, 47, 48, 49, 56, 57, 58, 61, 65, 67, 71, 73, 74, 77, 82, 84, 85, 86, 87, 88, 89, 96, 97, 98, 100, 101, 102, 105, 107, 108, 109, 110, 113, 116, 118, 125, 126, 128, 131, 134, 137, 138, 147, 151, 152, 153, 154, 156, 159, 163, 166, 168, 169, 176, 178, 181, 187, 188, 192, 195, 197, 200, 205, 206, 207, 214, 215, 216, 217, 219, 223, 231, 236, 241, 243]
@@ -298,6 +299,7 @@ class RandomBytes extends Component {
       ChordActive: 0,
       UsedCIDs: [],
       SpecialWords: [],
+      SaveSessionString: "none",
       hideDisplayAEM: {
         display: "none",
       },
@@ -468,9 +470,12 @@ class RandomBytes extends Component {
           })
         }
       }
-      if (this.state.PlayingOrNot > 0 && this.props.IntlDon > 10000000000000000000000) {
+      if (this.state.PlayingOrNot > 0 && this.props.IntlDon >= 100000000000000000000) {
         this.midiSounds.playChordNow(this.state.selectedInstrument, [(this.state.ChordSeq[this.state.ChordActive])[MyNote]], 0.3);
       }
+      this.setState({
+        SaveSessionString: Date().toString()+"."+(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length][89]-128).toString()+"λ;"+this.state.RunningZ.toFixed(3).toString()+";"+this.state.Ncount.toString()+";"+this.state.SpecialWords+";-999;"
+      })
       //console.log(this.state.RunningZY)
       //console.log(int2bitsum(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length]))
       //console.log(this.state.usersbytes[this.state.Ncount%this.state.usersbytes.length].reduce((result,number)=> result+number))
@@ -682,6 +687,8 @@ class RandomBytes extends Component {
             />
           </StyledEngineProvider>
         </div>
+
+        <Savebutton onSubmitData={this.props.onSubmitData} passedMessage={this.state.SaveSessionString}/>
 
 
       </div>

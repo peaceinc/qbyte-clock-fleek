@@ -214,7 +214,7 @@ class Display extends Component {
               <br></br>
               All donations go directly to our <a
                 className="App-link"
-                href="https://testnet.app.astrodao.com/dao/peace-inc.sputnikv2.testnet"
+                href="https://app.astrodao.com/dao/peaceinc.sputnik-dao.near"
                 target="_blank"
                 rel="noopener noreferrer"
               >

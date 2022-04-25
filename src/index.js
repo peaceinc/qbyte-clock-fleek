@@ -8,7 +8,7 @@ import * as nearAPI from 'near-api-js';
 async function initContract() {
   // get network configuration values from config.js
   // based on the network ID we pass to getConfig()
-  const nearConfig = getConfig(process.env.NEAR_ENV || 'testnet');
+  const nearConfig = getConfig(process.env.NEAR_ENV || 'mainnet');
 
   // create a keyStore for signing transactions using the user's key
   // which is located in the browser local storage after user logs in

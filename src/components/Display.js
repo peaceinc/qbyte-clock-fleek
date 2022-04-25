@@ -110,29 +110,7 @@ class Display extends Component {
               You have donated {this.state.currentDonation/(1000000000000000000000000)} NEAR.
             </font>
           </p>
-          <p>
-            <font size="5">
-              Donation Tiers (1 Yocto NEAR = 0.000000000000000000000001 NEAR):
-              <br></br>
-              <br></br>
-              1 Yocto NEAR: unlocks the basic clock with 1 word displayed per second
-              <br></br>
-              <br></br>
-              27182818 Yocto NEAR: Unlocks the AEtherspheric Modulator (2 dimensional array of colors)
-              <br></br>
-              <br></br>
-              31415927 Yocto NEAR: Unlocks the Hypercube (3 dimensional array of colors)
-              <br></br>
-              <br></br>
-              0.0001 NEAR: Unlocks sound effects (you can turn these on and off)
-              <br></br>
-              <br></br>
-              0.001 NEAR: Unlocks word oracle
-              <br></br>
-              <br></br>
-              0.01 NEAR: Data stream is personalized to your NEAR address
-            </font>
-          </p>
+
           <p>
             <font size="5">
               The Q-Byte Clock tells the time while demonstrating what time is.
@@ -164,7 +142,14 @@ class Display extends Component {
           >
             Video Explanation for QByte Clock Data
           </a>
-
+          <font size="3">
+            The donation box on this page allows you to donate in 0.000001 NEAR increments. To unlock all features, please donate 0.01 NEAR. If you are familiar with the NEAR CLI, you can donate lesser amounts with this command (e.g. 1 Yocto NEAR):
+            <br></br>
+            <br></br>
+            <code>
+              near call clock.dani-rs.testnet update_donation --accountId your_account.testnet --amount 0.000000000000000000000001
+            </code>
+          </font>
           <div
             style={
               this.state.displayClock
@@ -200,6 +185,43 @@ class Display extends Component {
 
         <img src={logo} className="App-logo" alt="logo" />
         <YoutubeEmbed embedId="Zlc3stcYAmI" />
+
+        <p>
+            <font size="5">
+              Donation Tiers (1 Yocto NEAR = 0.000000000000000000000001 NEAR):
+              <br></br>
+              <br></br>
+              1 Yocto NEAR: unlocks the basic clock with 1 word displayed per second
+              <br></br>
+              <br></br>
+              27182818 Yocto NEAR: Unlocks the AEtherspheric Modulator (2 dimensional array of colors)
+              <br></br>
+              <br></br>
+              31415927 Yocto NEAR: Unlocks the Hypercube (3 dimensional array of colors)
+              <br></br>
+              <br></br>
+              0.0001 NEAR: Unlocks sound effects (you can turn these on and off)
+              <br></br>
+              <br></br>
+              0.001 NEAR: Unlocks word oracle
+              <br></br>
+              <br></br>
+              0.01 NEAR: Data stream is personalized to your NEAR address
+              <br></br>
+              <br></br>
+
+              <br></br>
+              <br></br>
+              All donations go directly to our <a
+                className="App-link"
+                href="https://testnet.app.astrodao.com/dao/peace-inc.sputnikv2.testnet"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Astro DAO
+              </a>
+            </font>
+          </p>
       </div>
     );
   }

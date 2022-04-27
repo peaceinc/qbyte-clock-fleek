@@ -147,7 +147,7 @@ class Display extends Component {
             <br></br>
             <br></br>
             <code>
-              near call clock.dani-rs.testnet update_donation --accountId your_account.testnet --amount 0.000000000000000000000001
+              near call qbyte_clock_core2.near update_donation --accountId {this.state.currentUser.accountId} --amount 0.000000000000000000000001
             </code>
           </font>
           <div

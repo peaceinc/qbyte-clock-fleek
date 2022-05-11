@@ -16,6 +16,7 @@ export default function Form({ onSubmit, currentUser }) {
             min="0"
             step="0.000001"
             type="number"
+            style={{width: 140}}
           />
           <span title="NEAR Tokens">Ⓝ</span>
         </p>

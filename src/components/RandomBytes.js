@@ -13,6 +13,7 @@ import Plot from 'react-plotly.js';
 import { sha256 } from 'js-sha256';
 import MIDISounds from 'midi-sounds-react';
 import Savebutton from "./Savebutton"
+import AnalogClock from 'analog-clock-react';
 //import {sha256} from 'react-native-sha256';
 //import {Line} from 'react-chartjs-2';
 
@@ -300,6 +301,19 @@ class RandomBytes extends Component {
       UsedCIDs: [],
       SpecialWords: [],
       SaveSessionString: "none",
+      clockopts: {
+        width: "600px",
+        border: true,
+        borderColor: "#2e2e2e",
+        baseColor: "#17a2b8",
+        centerColor: "#459cff",
+        centerBorderColor: "#ffffff",
+        handColors: {
+          second: "#d81c7a",
+          minute: "#ffffff",
+          hour: "#ffffff"
+        }
+      },
       hideDisplayAEM: {
         display: "none",
       },
@@ -326,6 +340,7 @@ class RandomBytes extends Component {
       },
     };
   }
+
 
   // collections b5864e77-7403-4a39-b573-e122fb87267f 47334123-5caa-4d98-9440-3b2412579842
   
@@ -449,6 +464,19 @@ class RandomBytes extends Component {
         //RunningZX: this.state.usersbytes.push(14),
         //RunningZX: MyAppend(this.state.RunningZX.slice(),this.state.Ncount + 1),
         //RunningZY: MyAppend(this.state.RunningZY.slice(),GetRunningZ(this.state.byteIntegerSum + currentbytesum, this.state.Ncount + 1))
+        clockopts: {
+          width: "600px",
+          border: true,
+          borderColor: MyColors[0],
+          baseColor: MyColors[1],
+          centerColor: MyColors[2],
+          centerBorderColor: MyColors[3],
+          handColors: {
+            second: MyColors[4],
+            minute: MyColors[5],
+            hour: MyColors[6]
+          }
+        },
       });
 
       if (this.state.CurrentVSTD < 0.7) {
@@ -541,8 +569,23 @@ class RandomBytes extends Component {
   }
 
   render() {
+
+
+
     return (
       <div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <AnalogClock {...this.state.clockopts} />
+        </div>
+        
+        
         <Box paddingBottom="20px">
           <Grid container spacing={0.5}>
             <Grid item xs={1.5}>
@@ -571,6 +614,7 @@ class RandomBytes extends Component {
             </Grid>
           </Grid>
         </Box>
+        
         <Box paddingBottom="18px">
           <Grid container spacing={2.5}>
             <Grid item xs={12}>

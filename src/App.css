@@ -85,3 +85,13 @@ p
 #first-letter-4 {
   color: yellow
 }
+
+th, td {
+  font-family: ‘Lato’, sans-serif;
+  font-weight: 400;
+  padding: 0px;  /*This should still be 20px;*/
+  text-align: left;
+  width: 0.5%;
+  font-size: 18px; /*Add this line to your code*/
+  }
+  

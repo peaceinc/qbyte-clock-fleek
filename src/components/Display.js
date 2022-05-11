@@ -181,6 +181,8 @@ class Display extends Component {
             )
           })}
         </table>
+
+
         </header>
 
         <img src={logo} className="App-logo" alt="logo" />

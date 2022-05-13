@@ -5,20 +5,44 @@ import { StyledEngineProvider } from "@mui/material/styles";
 import RandomBytes from "./RandomBytes";
 import Clock from "./clock";
 import YoutubeEmbed from "./YoutubeEmbed";
+import Plot from 'react-plotly.js';
 //import Clock from 'react-clock';
+
+// function GetTableData(instr) {
+//   let sessions = instr.split(';-999;');
+//   var OutData = []
+//   for (var i=0; i < sessions.length -1; i++) {
+//     let sdata = sessions[i].split(';')
+//     //let sstr = '{"zscore":'+sdata[0]+', "oracle":"'+sdata[1]+'" }'
+//     let sstr = '{"datetime":"'+sdata[0]+'", "zscore":'+sdata[1]+', "n":'+sdata[2]+', "oracle":"'+sdata[3]+'" }'
+//     OutData.push(JSON.parse(sstr))
+//   }
+//   return OutData
+
+// }
 
 function GetTableData(instr) {
   let sessions = instr.split(';-999;');
   var OutData = []
+  var OutDatetime=[]
+  var OutZ=[]
+  var OutN=[]
+  var OutOracle=[]
   for (var i=0; i < sessions.length -1; i++) {
     let sdata = sessions[i].split(';')
-    //let sstr = '{"zscore":'+sdata[0]+', "oracle":"'+sdata[1]+'" }'
-    let sstr = '{"datetime":"'+sdata[0]+'", "zscore":'+sdata[1]+', "n":'+sdata[2]+', "oracle":"'+sdata[3]+'" }'
-    OutData.push(JSON.parse(sstr))
+    OutDatetime.push(sdata[0])
+    OutZ.push(sdata[1])
+    OutN.push(sdata[2])
+    OutOracle.push(sdata[3].replace(/,/g, ' '))
   }
+  OutData.push(OutDatetime)
+  OutData.push(OutZ)
+  OutData.push(OutN)
+  OutData.push(OutOracle)
   return OutData
 
 }
+
 
 class Display extends Component {
   constructor(props) {
@@ -104,6 +128,19 @@ class Display extends Component {
               with Non-deterministic Machine Learning Language Oracle{" "}
             </font>
           </p>
+          <div
+            style={
+              this.state.displayClock
+                ? this.state.showDisplay
+                : this.state.hideDisplay
+            }
+          >
+            <StyledEngineProvider injectFirst>
+              <Clock />
+              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.currentDonation} showAEM={this.state.displayAEM} showHC={this.state.displayHC} showMidi={this.state.displayMidi} showOracle={this.state.displayOracle} onSubmitData={this.props.onSubmitData}/>
+            </StyledEngineProvider>
+          </div>
+
           <p>
             <font size="5">
               Welcome to the Q-Byte Clock, {this.state.currentUser.accountId}!
@@ -150,37 +187,72 @@ class Display extends Component {
               near call qbyte_clock_core2.near update_donation --accountId {this.state.currentUser.accountId} --amount 0.000000000000000000000001
             </code>
           </font>
-          <div
-            style={
-              this.state.displayClock
-                ? this.state.showDisplay
-                : this.state.hideDisplay
-            }
-          >
-            <StyledEngineProvider injectFirst>
-              <Clock />
-              <RandomBytes IntlHashMsg={this.state.currentUser.accountId} IntlDon={this.state.currentDonation} showAEM={this.state.displayAEM} showHC={this.state.displayHC} showMidi={this.state.displayMidi} showOracle={this.state.displayOracle} onSubmitData={this.props.onSubmitData}/>
-            </StyledEngineProvider>
-          </div>
+
         
-        <table>
-          <tr>
-            <th>datetime</th>
-            <th>zscore</th>
-            <th>n</th>
-            <th>oracle</th>
-          </tr>
-          {MyData.map((val, key) => {
-            return (
-              <tr key={key}>
-                <td>{val.datetime}</td>
-                <td>{val.zscore}</td>
-                <td>{val.n}</td>
-                <td>{val.oracle}</td>
-              </tr>
-            )
-          })}
-        </table>
+          <Plot
+              layout={{width: 1000, height: 500, title: {"text": "Previous Sessions Saved On-Chain"}}}
+
+
+              data={
+
+                [{
+
+                  "type": "table",
+          
+                  "domain": {
+                      "x": [0, 1],
+                      "y": [0, 1]
+                  },
+          
+                  "columnwidth": [20, 5, 5, 60],
+                  "columnorder": [0, 1, 2, 3],
+          
+                  "header": {
+          
+                      "height": 30,
+          
+                      "values": [["datetime"], ["Z"], ["n"], ["Oracle"]],
+          
+                      "align": ["left", "left", "left", "left"],
+          
+                      "line": {"width": 1, "color": ["dimgray", "grey"]},
+          
+                      "fill": {
+                          "color": ["dimgray", "grey"]
+                      },
+          
+                      "font": {
+                          "family": "Arial",
+                          "size": [[14, 12]],
+                          "color": ["white", "white", "white", "white"]
+                      }
+                  },
+          
+                  "cells": {
+          
+                      "values": MyData,
+
+                      "height": 26,
+          
+                      "align": ["center", "center", "center", "left"],
+          
+                      "line": {
+                          "color": [
+                              "grey"
+                          ],
+                          "width": 1
+                      },
+          
+                      "font": {
+                          "family": "Arial",
+                          "size": 12,
+                          "color": ["black"]
+                      }
+                  }
+              }]
+
+              }
+            />
 
 
         </header>

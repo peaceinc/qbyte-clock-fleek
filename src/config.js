@@ -1,4 +1,4 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME || 'qbyte_clock_core2.near';
+const CONTRACT_NAME = process.env.CONTRACT_NAME || 'clock.dani-rs.testnet';
 
 function getConfig(env) {
   switch(env) {

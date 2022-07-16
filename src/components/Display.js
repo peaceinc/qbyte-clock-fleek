@@ -184,7 +184,7 @@ class Display extends Component {
             <br></br>
             <br></br>
             <code>
-              near call qbyte_clock_core2.near update_donation --accountId {this.state.currentUser.accountId} --amount 0.000000000000000000000001
+              near call clock.dani-rs.testnet update_donation --accountId {this.state.currentUser.accountId} --amount 0.000000000000000000000001
             </code>
           </font>
 
@@ -288,7 +288,7 @@ class Display extends Component {
               <br></br>
               All donations go directly to our <a
                 className="App-link"
-                href="https://app.astrodao.com/dao/peaceinc.sputnik-dao.near"
+                href="https://testnet.app.astrodao.com/dao/peace-inc.sputnikv2.testnet"
                 target="_blank"
                 rel="noopener noreferrer"
               >

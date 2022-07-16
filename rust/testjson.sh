@@ -1,0 +1,1 @@
+near call clock.dani-rs.testnet update_storestr '{"mystr":"word1,word2,word6"}' --accountId dani-mint.testnet

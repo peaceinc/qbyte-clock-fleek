@@ -300,6 +300,7 @@ class RandomBytes extends Component {
       ChordActive: 0,
       UsedCIDs: [],
       SpecialWords: [],
+      EventLog: [],
       SaveSessionString: "none",
       clockopts: {
         width: "600px",
@@ -352,7 +353,7 @@ class RandomBytes extends Component {
     
     axios
       .get(
-        "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
+        "https://api.estuary.tech/collections/content?coluuid=d0e46d0d-7e4c-4bce-8401-ee1a10b89f3d",
         {
           method: "GET",
           headers: {
@@ -365,6 +366,7 @@ class RandomBytes extends Component {
         var latest_cid = FindLatest(res.data,this.state.UsedCIDs);
         this.setState({
           UsedCIDs: MyAppend(this.state.UsedCIDs,latest_cid),
+          EventLog: MyAppend(this.state.EventLog,latest_cid+" | "+Date().toString())
         });
         let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
         console.log(dataUrl);
@@ -382,14 +384,17 @@ class RandomBytes extends Component {
       .then((array) => {
         this.setState({
           usersbytes: array,
+          
         });
         console.log("succesful estuary pull")
+        EventLog: MyAppend(this.state.EventLog,"Succesful Estuary Pull | "+Date().toString())
       })
       .catch((error) => {
         console.error("Error: ", error);
         console.log("using PRNG instead");
         this.setState({
           usersbytes: ActualPRNG(),
+          EventLog: MyAppend(this.state.EventLog,"Rejected - Using PRNG | "+Date().toString())
         });
       });
     
@@ -399,7 +404,7 @@ class RandomBytes extends Component {
       if (this.state.Ncount%this.state.usersbytes.length==0 && this.state.Ncount>10) {
         axios
         .get(
-          "https://api.estuary.tech/collections/content/47334123-5caa-4d98-9440-3b2412579842",
+          "https://api.estuary.tech/collections/content?coluuid=d0e46d0d-7e4c-4bce-8401-ee1a10b89f3d",
           {
             method: "GET",
             headers: {
@@ -412,6 +417,7 @@ class RandomBytes extends Component {
           var latest_cid = FindLatest(res.data,this.state.UsedCIDs)//res.data[res.data.length - 1]["cid"];
           this.setState({
             UsedCIDs: MyAppend(this.state.UsedCIDs,latest_cid),
+            EventLog: MyAppend(this.state.EventLog,latest_cid+" | "+Date().toString())
           });
           let dataUrl = `https://${latest_cid}.ipfs.dweb.link`;
           console.log(dataUrl)
@@ -431,12 +437,14 @@ class RandomBytes extends Component {
             usersbytes: array,
           });
           console.log("succesful estuary pull")
+          EventLog: MyAppend(this.state.EventLog,"Succesful Estuary Pull | "+Date().toString())
         })
         .catch((error) => {
           console.error("Error: ", error);
           console.log("using PRNG instead");
           this.setState({
             usersbytes: ActualPRNG(),
+            EventLog: MyAppend(this.state.EventLog,"Rejected - Using PRNG | "+Date().toString())
           });
         });
       }
@@ -497,6 +505,9 @@ class RandomBytes extends Component {
             ChordActive: this.state.ChordActive + 1
           })
         }
+        this.setState({
+          EventLog: MyAppend(this.state.EventLog,"Modulation | "+Date().toString())
+        })
       }
       if (this.state.PlayingOrNot > 0 && this.props.IntlDon >= 100000000000000000000) {
         this.midiSounds.playChordNow(this.state.selectedInstrument, [(this.state.ChordSeq[this.state.ChordActive])[MyNote]], 0.3);
@@ -638,6 +649,7 @@ class RandomBytes extends Component {
             <br></br>
             <br></br>
             Language Oracle: {this.state.SpecialWords.toString()}
+
           </StyledEngineProvider>
         </div>
 
@@ -733,6 +745,8 @@ class RandomBytes extends Component {
         </div>
 
         <Savebutton onSubmitData={this.props.onSubmitData} passedMessage={this.state.SaveSessionString}/>
+
+        Event Log: {this.state.EventLog.toString()}
 
 
       </div>

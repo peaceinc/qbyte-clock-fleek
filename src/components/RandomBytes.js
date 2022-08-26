@@ -384,10 +384,9 @@ class RandomBytes extends Component {
       .then((array) => {
         this.setState({
           usersbytes: array,
-          
+          EventLog: MyAppend(this.state.EventLog,"Succesful Estuary Pull | "+Date().toString())
         });
         console.log("succesful estuary pull")
-        EventLog: MyAppend(this.state.EventLog,"Succesful Estuary Pull | "+Date().toString())
       })
       .catch((error) => {
         console.error("Error: ", error);
@@ -435,9 +434,9 @@ class RandomBytes extends Component {
         .then((array) => {
           this.setState({
             usersbytes: array,
+            EventLog: MyAppend(this.state.EventLog,"Succesful Estuary Pull | "+Date().toString())
           });
           console.log("succesful estuary pull")
-          EventLog: MyAppend(this.state.EventLog,"Succesful Estuary Pull | "+Date().toString())
         })
         .catch((error) => {
           console.error("Error: ", error);
@@ -506,7 +505,7 @@ class RandomBytes extends Component {
           })
         }
         this.setState({
-          EventLog: MyAppend(this.state.EventLog,"Modulation | "+Date().toString())
+          EventLog: MyAppend(this.state.EventLog,"Modulation at t="+this.state.Ncount+"| "+Date().toString())
         })
       }
       if (this.state.PlayingOrNot > 0 && this.props.IntlDon >= 100000000000000000000) {
@@ -745,8 +744,11 @@ class RandomBytes extends Component {
         </div>
 
         <Savebutton onSubmitData={this.props.onSubmitData} passedMessage={this.state.SaveSessionString}/>
-
-        Event Log: {this.state.EventLog.toString()}
+        <p>
+          <font size="2">
+            Event Log: {this.state.EventLog.toString()}
+          </font>
+        </p>
 
 
       </div>
